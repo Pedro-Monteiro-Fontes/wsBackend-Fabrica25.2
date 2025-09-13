@@ -5,7 +5,6 @@ from .forms import PlayerProfileForm, PlayerUserCreationForm
 from django.contrib.auth import login
 
 def home(request):
-    # apresentação simples do time (se existir)
     team = Team.objects.first()
     return render(request, 'app/home.html', {'team': team})
 
@@ -18,14 +17,12 @@ def dashboard(request):
 
 @user_passes_test(lambda u: u.is_coach())
 def coach_dashboard(request):
-    # lista jogadores do(s) time(s) do treinador
     teams = request.user.teams.all()
     players = PlayerProfile.objects.filter(team__in=teams)
     return render(request, 'app/coach_dashboard.html', {'players': players, 'teams': teams})
 
 @login_required
 def player_dashboard(request):
-    # jogador vê todos os jogadores do time (somente leitura)
     profile = get_object_or_404(PlayerProfile, user=request.user)
     team_players = PlayerProfile.objects.filter(team=profile.team)
     return render(request, 'app/player_dashboard.html', {'players': team_players})
@@ -49,7 +46,7 @@ def add_player(request, team_id):
     else:
         user_form = PlayerUserCreationForm(initial={'role': 'player'})
         profile_form = PlayerProfileForm()
-    return render(request, 'app/add_player.html', {'user_form': user_form, 'profile_form': profile_form, 'team':team})
+    return render(request, 'app/add_player.html', {'user_form': user_form, 'profile_form': profile_form, 'team': team})
 
 @user_passes_test(lambda u: u.is_coach())
 def edit_player_stats(request, player_id):
