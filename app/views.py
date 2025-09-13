@@ -51,6 +51,9 @@ def add_player(request, team_id):
 @user_passes_test(lambda u: u.is_coach())
 def edit_player_stats(request, player_id):
     profile = get_object_or_404(PlayerProfile, id=player_id)
+    # Permite edição apenas se o jogador pertence a um time do coach
+    if profile.team.coach != request.user:
+        return redirect('coach_dashboard')
     if request.method == 'POST':
         form = PlayerProfileForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
@@ -63,9 +66,33 @@ def edit_player_stats(request, player_id):
 @user_passes_test(lambda u: u.is_coach())
 def delete_player(request, player_id):
     profile = get_object_or_404(PlayerProfile, id=player_id)
+    # Permite exclusão apenas se o jogador pertence a um time do coach
+    if profile.team.coach != request.user:
+        return redirect('coach_dashboard')
     if request.method == 'POST':
         user = profile.user
         profile.delete()
         user.delete()
         return redirect('coach_dashboard')
     return render(request, 'app/confirm_delete.html', {'profile': profile})
+
+@login_required
+@user_passes_test(lambda u: u.is_coach())
+def create_player(request):
+    if request.method == "POST":
+        user_form = PlayerUserCreationForm(request.POST)
+        profile_form = PlayerProfileForm(request.POST, request.FILES)
+        if user_form.is_valid() and profile_form.is_valid():
+            user = user_form.save(commit=False)
+            user.role = 'player'
+            user.set_password(user_form.cleaned_data['password1'])
+            user.save()
+            profile = profile_form.save(commit=False)
+            profile.user = user
+            # O coach deve escolher o time ao criar o jogador
+            profile.save()
+            return redirect('coach_dashboard')
+    else:
+        user_form = PlayerUserCreationForm(initial={'role': 'player'})
+        profile_form = PlayerProfileForm()
+    return render(request, 'app/create_player.html', {'user_form': user_form, 'profile_form': profile_form})

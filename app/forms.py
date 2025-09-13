@@ -16,3 +16,4 @@ class PlayerProfileForm(forms.ModelForm):
     class Meta:
         model = PlayerProfile
         fields = ('team','photo','points_per_game','assists','rebounds','minutes')
+

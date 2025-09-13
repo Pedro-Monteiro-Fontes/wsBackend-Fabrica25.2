@@ -1,0 +1,11 @@
+<h2>Novo Jogador</h2>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Salvar</button>
+</form>
+<p>{{ player.name }}</p>
+{% if player.photo %}
+    <img src="{{ player.photo.url }}" width="200">
+{% endif %}
+
