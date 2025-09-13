@@ -18,9 +18,18 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from app import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('app.urls')),
     path('accounts/', include('django.contrib.auth.urls')),  # login, logout, password reset
+    path('', include('app.urls')),  # Deixe a home no app.urls
+    # Remova a linha abaixo, pois a home deve estar em app.urls
+    # path('', views.home, name='home'),
+    path('dashboard/', views.dashboard, name='dashboard'),
+    path('coach/', views.coach_dashboard, name='coach_dashboard'),
+    path('player/', views.player_dashboard, name='player_dashboard'),
+    path('team/<int:team_id>/add-player/', views.add_player, name='add_player'),
+    path('player/<int:player_id>/edit/', views.edit_player_stats, name='edit_player'),
+    path('player/<int:player_id>/delete/', views.delete_player, name='delete_player'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
