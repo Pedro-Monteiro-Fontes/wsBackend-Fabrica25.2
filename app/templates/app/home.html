@@ -1,0 +1,11 @@
+{% extends 'app/base.html' %}
+{% block title %}Home{% endblock %}
+{% block content %}
+  <div class="jumbotron">
+    <h1>Bem-vindo ao time {{ team.name if team else 'Meu Time' }}</h1>
+    <p>{{ team.description }}</p>
+    {% if not user.is_authenticated %}
+      <a class="btn btn-primary" href="{% url 'login' %}">Entrar</a>
+    {% endif %}
+  </div>
+{% endblock %}
